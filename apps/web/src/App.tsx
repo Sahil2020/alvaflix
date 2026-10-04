@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Search, Bell, Play, Plus, Check, ChevronDown, ChevronLeft, ChevronRight, Volume2, Sparkles, Menu, X } from 'lucide-react';
 
-type Title = { id: string; name: string; year: number; rating: string; duration: string; genre: string; synopsis: string; image: string; accent: string; featured?: boolean };
+type Title = { id: string; name: string; year: number; rating: string; duration: string; genre: string; synopsis: string; image: string; accent: string; videoUrl?: string; featured?: boolean };
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 const fallback: Title[] = [
   { id: 'the-last-light', name: 'The Last Light', year: 2025, rating: 'U/A 16+', duration: '2h 08m', genre: 'Sci-fi thriller', synopsis: 'When the stars begin to disappear, one radio astronomer discovers a signal that should not exist.', image: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1800&q=85', accent: '#283c69', featured: true },
@@ -12,6 +12,7 @@ const fallback: Title[] = [
   { id: 'deep-blue', name: 'Deep Blue', year: 2024, rating: 'U/A 7+', duration: '1h 34m', genre: 'Documentary', synopsis: 'A research crew follows the ocean’s oldest travelers across a changing sea.', image: 'https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&w=1000&q=80', accent: '#23617a' },
   { id: 'city-of-small-things', name: 'City of Small Things', year: 2024, rating: 'U/A 13+', duration: '2 Seasons', genre: 'Comedy', synopsis: 'The everyday dramas of one apartment building turn out to be anything but ordinary.', image: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=1000&q=80', accent: '#7b544d' },
   { id: 'northbound', name: 'Northbound', year: 2023, rating: 'U/A 16+', duration: '1h 48m', genre: 'Adventure', synopsis: 'A stranded climber and a local guide race the first winter storm down the mountain.', image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1000&q=80', accent: '#424d64' },
+  { id: 'big-buck-bunny-demo', name: 'Big Buck Bunny', year: 2008, rating: 'U', duration: '10m', genre: 'Open movie · Animation', synopsis: 'A gentle giant rabbit finds a clever way to stand up to three mischievous woodland bullies. Open movie by the Blender Foundation.', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Big_buck_bunny_poster_big.jpg/1200px-Big_buck_bunny_poster_big.jpg', accent: '#577e52', videoUrl: 'https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4' },
 ];
 
 function App() {
@@ -32,9 +33,13 @@ function App() {
 
   const filtered = useMemo(() => titles.filter((title) => `${title.name} ${title.genre} ${title.synopsis}`.toLowerCase().includes(query.toLowerCase())), [titles, query]);
   const toggleSaved = (title: Title) => setSaved((items) => items.includes(title.id) ? items.filter((id) => id !== title.id) : [...items, title.id]);
-  const play = (title: Title) => { setSelected(title); setNotice('Sample playback is being prepared. Add an approved video source to enable streaming.'); window.setTimeout(() => setNotice(''), 4200); };
+  const play = (title: Title) => {
+    if (title.videoUrl) { setSelected(title); return; }
+    setNotice('A video source has not been added for this title yet.');
+    window.setTimeout(() => setNotice(''), 3200);
+  };
   const rows = [
-    { name: 'Made for your next night in', items: titles.slice(1, 6) },
+    { name: 'Made for your next night in', items: [...titles.slice(1, 6), ...titles.filter((title) => title.videoUrl)] },
     { name: 'Stories worth staying up for', items: [...titles.slice(2, 6), ...titles.slice(0, 2)] },
     ...(saved.length ? [{ name: 'Your watchlist', items: titles.filter((title) => saved.includes(title.id)) }] : []),
   ];
@@ -68,12 +73,12 @@ function App() {
     </main>
 
     {notice && <div className="toast"><Sparkles size={16} />{notice}</div>}
-    {selected && <div className="modal-backdrop" onClick={() => setSelected(null)}><section className="detail-modal" onClick={(e) => e.stopPropagation()}><button className="modal-close icon-button" onClick={() => setSelected(null)} aria-label="Close details"><X /></button><div className="modal-art" style={{ backgroundImage: `linear-gradient(0deg,#111820 0%,transparent 80%),url("${selected.image}")` }}><span className="eyebrow"><Sparkles size={13} /> ALVAFLIX ORIGINAL</span></div><div className="modal-content"><h2>{selected.name}</h2><div className="meta"><span className="match">98% match</span><span>{selected.year}</span><span className="age-rating">{selected.rating}</span><span>{selected.duration}</span></div><p>{selected.synopsis}</p><div className="hero-buttons"><button className="button-primary" onClick={() => play(selected)}><Play size={17} fill="currentColor" /> Play now</button><button className="round-action" onClick={() => toggleSaved(selected)} aria-label="Add to watchlist">{saved.includes(selected.id) ? <Check /> : <Plus />}</button></div><div className="detail-extra"><span>GENRE</span><strong>{selected.genre}</strong><span>AVAILABLE IN</span><strong>4K UHD · Dolby Audio</strong></div></div></section></div>}
+    {selected && <div className="modal-backdrop" onClick={() => setSelected(null)}><section className="detail-modal" onClick={(e) => e.stopPropagation()}><button className="modal-close icon-button" onClick={() => setSelected(null)} aria-label="Close details"><X /></button>{selected.videoUrl ? <div className="player-frame"><video controls autoPlay playsInline poster={selected.image} src={selected.videoUrl}>Your browser does not support HTML video.</video><span className="player-caption">DEMO VIDEO · Big Buck Bunny © Blender Foundation · CC BY 3.0</span></div> : <div className="modal-art" style={{ backgroundImage: `linear-gradient(0deg,#111820 0%,transparent 80%),url("${selected.image}")` }}><span className="eyebrow"><Sparkles size={13} /> ALVAFLIX ORIGINAL</span></div>}<div className="modal-content"><h2>{selected.name}</h2><div className="meta"><span className="match">98% match</span><span>{selected.year}</span><span className="age-rating">{selected.rating}</span><span>{selected.duration}</span></div><p>{selected.synopsis}</p><div className="hero-buttons">{!selected.videoUrl && <button className="button-primary" onClick={() => play(selected)}><Play size={17} fill="currentColor" /> Play now</button>}<button className="round-action" onClick={() => toggleSaved(selected)} aria-label="Add to watchlist">{saved.includes(selected.id) ? <Check /> : <Plus />}</button></div><div className="detail-extra"><span>GENRE</span><strong>{selected.genre}</strong>{selected.videoUrl ? <><span>LICENSE</span><strong>Blender Foundation · CC BY 3.0</strong></> : <><span>VIDEO</span><strong>Source not configured</strong></>}</div></div></section></div>}
   </div>;
 }
 
 function Poster({ title, rank, saved, onSave, onSelect }: { title: Title; rank?: number; saved: boolean; onSave: () => void; onSelect: () => void }) {
-  return <article className="poster-card">{rank && <span className="rank">{String(rank).padStart(2, '0')}</span>}<button className="poster-image" onClick={onSelect} aria-label={`Open ${title.name}`} style={{ backgroundImage: `linear-gradient(0deg,rgba(5,8,12,.78),transparent 62%),url("${title.image}")` }}><span className="poster-play"><Play size={16} fill="currentColor" /></span><span className="poster-kind">{title.genre}</span></button><div className="poster-details"><div><strong>{title.name}</strong><span>{title.year} <i /> {title.duration}</span></div><button className={saved ? 'save-action saved' : 'save-action'} onClick={onSave} aria-label={saved ? `Remove ${title.name} from watchlist` : `Add ${title.name} to watchlist`}>{saved ? <Check size={15} /> : <Plus size={15} />}</button></div></article>;
+  return <article className="poster-card">{rank && <span className="rank">{String(rank).padStart(2, '0')}</span>}<button className="poster-image" onClick={onSelect} aria-label={`Open ${title.name}`} style={{ backgroundImage: `linear-gradient(0deg,rgba(5,8,12,.78),transparent 62%),url("${title.image}")` }}><span className="poster-play"><Play size={16} fill="currentColor" /></span><span className="poster-kind">{title.genre}{title.videoUrl ? ' · DEMO' : ''}</span></button><div className="poster-details"><div><strong>{title.name}</strong><span>{title.year} <i /> {title.duration}</span></div><button className={saved ? 'save-action saved' : 'save-action'} onClick={onSave} aria-label={saved ? `Remove ${title.name} from watchlist` : `Add ${title.name} to watchlist`}>{saved ? <Check size={15} /> : <Plus size={15} />}</button></div></article>;
 }
 
 export default App;

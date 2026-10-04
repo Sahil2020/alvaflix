@@ -12,6 +12,7 @@ type Title = {
   synopsis: string;
   image: string;
   accent: string;
+  videoUrl?: string;
   featured?: boolean;
 };
 
@@ -24,6 +25,7 @@ const titles: Title[] = [
   { id: 'deep-blue', name: 'Deep Blue', year: 2024, rating: 'U/A 7+', duration: '1h 34m', genre: 'Documentary', synopsis: 'A research crew follows the ocean’s oldest travelers across a changing sea.', image: 'https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&w=1000&q=80', accent: '#23617a' },
   { id: 'city-of-small-things', name: 'City of Small Things', year: 2024, rating: 'U/A 13+', duration: '2 Seasons', genre: 'Comedy', synopsis: 'The everyday dramas of one apartment building turn out to be anything but ordinary.', image: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=1000&q=80', accent: '#7b544d' },
   { id: 'northbound', name: 'Northbound', year: 2023, rating: 'U/A 16+', duration: '1h 48m', genre: 'Adventure', synopsis: 'A stranded climber and a local guide race the first winter storm down the mountain.', image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1000&q=80', accent: '#424d64' },
+  { id: 'big-buck-bunny-demo', name: 'Big Buck Bunny', year: 2008, rating: 'U', duration: '10m', genre: 'Open movie · Animation', synopsis: 'A gentle giant rabbit finds a clever way to stand up to three mischievous woodland bullies. Open movie by the Blender Foundation.', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Big_buck_bunny_poster_big.jpg/1200px-Big_buck_bunny_poster_big.jpg', accent: '#577e52', videoUrl: 'https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4' },
 ];
 
 @Controller()

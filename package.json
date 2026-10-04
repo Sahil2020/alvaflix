@@ -1,0 +1,13 @@
+{
+  "name": "alvaflix",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["apps/web", "apps/api"],
+  "scripts": {
+    "dev": "concurrently -k \"npm run dev --workspace @alvaflix/api\" \"npm run dev --workspace @alvaflix/web\"",
+    "build": "npm run build --workspace @alvaflix/api && npm run build --workspace @alvaflix/web",
+    "dev:web": "npm run dev --workspace @alvaflix/web",
+    "dev:api": "npm run dev --workspace @alvaflix/api"
+  },
+  "devDependencies": { "concurrently": "^9.2.1" }
+}
